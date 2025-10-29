@@ -2,7 +2,7 @@
 
 An accessible implementation of 3D Gaussian Splatting designed for non-expert users, featuring a simplified, educational, and fully automated pipeline with a Google Colab interface.
 
-## 🚀 Quick Start with Google Colab
+## Quick Start with Google Colab
 
 **[Open in Google Colab](https://colab.research.google.com/github/DanielCob/accesible-gaussian-splatting/blob/main/accesible_gaussian_splatting.ipynb)**
 
