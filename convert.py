@@ -28,25 +28,33 @@ colmap_command = '"{}"'.format(args.colmap_executable) if len(args.colmap_execut
 magick_command = '"{}"'.format(args.magick_executable) if len(args.magick_executable) > 0 else "magick"
 use_gpu = 1 if not args.no_gpu else 0
 
+xvfb_prefix = "xvfb-run -a "
+
 if not args.skip_matching:
     os.makedirs(args.source_path + "/distorted/sparse", exist_ok=True)
 
-    ## Feature extraction
-    feat_extracton_cmd = colmap_command + " feature_extractor "\
-        "--database_path " + args.source_path + "/distorted/database.db \
-        --image_path " + args.source_path + "/input \
-        --ImageReader.single_camera 1 \
-        --ImageReader.camera_model " + args.camera + " \
-        --SiftExtraction.use_gpu " + str(use_gpu)
+    # Feature extraction
+    feat_extracton_cmd = (
+        f'{xvfb_prefix}{colmap_command} feature_extractor '
+        f'--database_path {args.source_path}/distorted/database.db '
+        f'--image_path {args.source_path}/input '
+        f'--ImageReader.single_camera 1 '
+        f'--ImageReader.camera_model {args.camera} '
+        f'--SiftExtraction.use_gpu {use_gpu}'
+    )
     exit_code = os.system(feat_extracton_cmd)
     if exit_code != 0:
         logging.error(f"Feature extraction failed with code {exit_code}. Exiting.")
         exit(exit_code)
 
-    ## Feature matching
-    feat_matching_cmd = colmap_command + " exhaustive_matcher \
-        --database_path " + args.source_path + "/distorted/database.db \
-        --SiftMatching.use_gpu " + str(use_gpu)
+    # Feature matching (sequential instead of exhaustive)
+    feat_matching_cmd = (
+        f'{xvfb_prefix}{colmap_command} sequential_matcher '
+        f'--database_path {args.source_path}/distorted/database.db '
+        f'--SiftMatching.use_gpu {use_gpu} '
+        f'--SequentialMatching.overlap 5 '
+        f'--SequentialMatching.quadratic_overlap 1'
+    )
     exit_code = os.system(feat_matching_cmd)
     if exit_code != 0:
         logging.error(f"Feature matching failed with code {exit_code}. Exiting.")
